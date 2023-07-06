@@ -1,10 +1,13 @@
 import sys
 from heapq import heappop, heappush
 import matplotlib.pyplot as plt
+import random
 
 class Graph:
     def __init__(self):
         self.graph = {}
+    def print(self):
+        print(self.graph);
 
     def add_location(self, location):
         self.graph[location] = []
@@ -50,13 +53,70 @@ class Graph:
             node=parent[node]
         ans.insert(0,node)
         return ans
+    def calculatedistance(self,start,end):
+        ans=self.optimizedpath(start,end)
+        distance=0
+        for i in range(len(ans)-1):
+            a=ans[i]
+            b=ans[i+1]
+            list=self.graph[a]
+            for j in range(len(list)):
+                tup=list[j]
+                if(tup[0]==b):
+                    distance+=tup[1]
+        return distance
+    def calculatetourlength(self,tour):
+        n=len(tour)
+        length=0
+        for i in range(n-1):
+            length+=self.calculatedistance(tour[i],tour[i+1])
+        return length
+    def perform_edge_exchange(self,i,j,tour):
+        new_tour=tour[:i+1]+tour[i+1:j+1][::-1]+tour[j+1:]
+        new_length=self.calculatetourlength(new_tour)
+        return new_tour,new_length
+    def lin_kernighan(self,tour):
+        n=len(tour)
+        tour_length = self.calculatetourlength(tour)
+        improved = True
+        while improved:
+            improved=False
+            for i in range(n):
+                for j in range(i+2,n):
+                    new_tour, new_length = self.perform_edge_exchange(i,j,tour)
+                    if new_length < tour_length:
+                        tour = new_tour
+                        tour_length = new_length
+                        improved = True
+                        break
+                if improved:
+                    break
+
+        return tour, tour_length
+    def optimized_lin_kernighan(self,tour):
+        length=map_graph.calculatetourlength(tour)
+        while(True):
+            a,b=self.lin_kernighan(tour)
+            if(b<length):
+                tour=a
+                length=b
+            print(tour)
+            print(length)
+            break
+        return tour,length
 
 
-        pass
+
+    
+
+        
+
+
+
+        
 
 
 map_graph = Graph()
-
 #================================================================================================================
 map_graph.add_location("A")
 map_graph.add_location("B")
@@ -101,8 +161,8 @@ map_graph.add_connection("P", "Q", 6)
 map_graph.add_connection("Q", "R", 3)
 map_graph.add_connection("R", "S", 5)
 map_graph.add_connection("S", "T", 2)
-map_graph.add_connection("T", "U", 4)
-map_graph.add_connection("A", "D", 9)
+map_graph.add_connection("T", "U", 400)
+map_graph.add_connection("A", "D", 90)
 map_graph.add_connection("B", "E", 7)
 map_graph.add_connection("C", "F", 6)
 map_graph.add_connection("D", "G", 3)
@@ -145,17 +205,42 @@ coordinates = {
     "T": (11, -2),
     "U": (12, -1)
 }
-plt.figure()
-for location, coord in coordinates.items():
-    plt.plot(coord[0], coord[1],'bo')  # Plotting locations as blue circles
-    plt.text(coord[0], coord[1] +0.1, location, ha='center')
+                                                         
 
-for location, connections in map_graph.graph.items():
-    for neighbor, weight in connections:
-        start_coord = coordinates[location]
-        end_coord = coordinates[neighbor]
-        plt.plot([start_coord[0], end_coord[0]], [start_coord[1], end_coord[1]], color='black')  # Plotting connections as black lines
-        plt.text((start_coord[0] + end_coord[0]) / 2, (start_coord[1] + end_coord[1]) / 2, str(weight), ha='right', color='green')  # Labeling connection weights
-plt.show()
-ans=map_graph.optimizedpath('B','U');
-print(ans)
+
+
+#======================================================================================
+def main():
+
+    plt.figure()
+    for location, coord in coordinates.items():
+        plt.plot(coord[0], coord[1],'bo')  # Plotting locations as blue circles
+        plt.text(coord[0], coord[1] +0.1, location, ha='center')
+
+    for location, connections in map_graph.graph.items():
+        for neighbor, weight in connections:
+            start_coord = coordinates[location]
+            end_coord = coordinates[neighbor]
+            plt.plot([start_coord[0], end_coord[0]], [start_coord[1], end_coord[1]], color='blue')  # Plotting connections as black lines
+            plt.text((start_coord[0] + end_coord[0]) / 2, (start_coord[1] + end_coord[1]) / 2, str(weight), ha='right', color='green')  # Labeling connection weights
+    plt.show()
+    tour=['H','D','E','A','S','T','U']
+    a=map_graph.optimizedpath('T','U')
+    print(a)
+    # ans,distance=map_graph.optimized_lin_kernighan(tour);
+    # for location in ans:
+    #     plt.plot(coordinates[location][0], coordinates[location][1],'bo')  # Plotting locations as blue circles
+    #     plt.text(coordinates[location][0], coordinates[location][1]+0.1,location, ha='center')
+    # plt.show()
+    # print("distance is :",distance)
+main()
+    
+
+
+
+
+
+
+#============================================================================================================
+
+

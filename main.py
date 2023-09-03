@@ -116,7 +116,7 @@ class Graph:
         return ans
     
 class plot:
-    def plotmap(coordinates,map_graph):
+    def plotmap(self,coordinates,map_graph):
         plt.figure()
         for location, coord in coordinates.items():
             plt.plot(coord[0], coord[1],'bo')  # Plotting locations as blue circles
@@ -128,6 +128,25 @@ class plot:
                 plt.plot([start_coord[0], end_coord[0]], [start_coord[1], end_coord[1]], color='blue')  # Plotting connections as black lines
                 plt.text((start_coord[0] + end_coord[0]) / 2, (start_coord[1] + end_coord[1]) / 2, str(weight), ha='right', color='green')  # Labeling connection weights
         plt.show()
+
+    def plotlocal(self,coordinates,route_array,map_graph):
+        plt.figure()
+        for location, coord in coordinates.items():
+            plt.plot(coord[0], coord[1],'bo')  # Plotting locations as blue circles
+            plt.text(coord[0], coord[1] +0.1, location, ha='center')
+        for i in range(len(route_array)-1):
+            x=route_array[i]
+            y=route_array[i+1]
+            weight=-1
+            for check in map_graph.graph[x]:
+                if(check[0]==y):
+                    weight=check[1]
+                    break
+            plt.plot([coordinates[x][0],coordinates[y][0] ], [coordinates[x][1], coordinates[y][1]], color='blue')  # Plotting connections as black lines
+            plt.text((coordinates[x][0] + coordinates[y][0]) / 2, (coordinates[x][1] + coordinates[y][1]) / 2,str(weight), ha='right', color='green')  # Labeling connection weights
+            
+
+        plt.show()    
 
 
 def graphinit():
@@ -221,44 +240,39 @@ def graphinit():
         "U": (12, -1)
     }
     
-    tour=['A','D','U','Q','J','F','O','N','B']
-    ans,distance=map_graph.optimized_lin_kernighan(tour)
-    ans=map_graph.totalroute(ans)
-    print(ans)
+    print("Enter 'Y' to see the map")
+    a=input()
+    if(a=='Y' or a=='y'):
+        #print("yes")
+        s=plot()
+        s.plotmap(coordinates,map_graph)
+        print("please enter")
+        print("1: if u want to find shortest path between two points")
+        print("2: if u want to find shortest path to cover multiple points ")
+        x=int(input())
+        if(x==1):
+            print("You have choosen first option")
+            print("Enter the 1st point : ",end='')
+            a=input()
+            print("Enter the 2nd point : ",end='')
+            b=input()
+            x=map_graph.optimizedpath(a,b)
+            y=map_graph.calculatedistance(a,b)
+            print("Distance of Fastest route is:",y,"units")
+            print("Fastest Route: ",end='')
+            print(x)
+            localcoordinates={}
+            for i in x:
+                y=coordinates[i]
+                localcoordinates[i]=y
+            print("Enter Y to see the map of fastest route")
+            a=input()
+            if(a=='Y' or a=='y'):
+                s.plotlocal(localcoordinates,x,map_graph)
+
+
+
+    
+
     
 graphinit()
-
-                                                            
-
-
-
-    #======================================================================================
-
-
-        
-
-            
-
-            
-
-
-
-
-        
-
-            
-
-
-
-            
-
-
-
-
-
-
-
-
-    
-
-
